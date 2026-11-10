@@ -12,7 +12,7 @@ public class Despesa extends Transacao {
     }
 
     @Override
-    public double aplicar(Conta, conta) {
+    public double aplicar(Conta conta) {
         return -getValor();
     }
 }

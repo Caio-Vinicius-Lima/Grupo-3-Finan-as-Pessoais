@@ -1,20 +1,16 @@
-public class categorias {
-    
-    private double id;
+public class Categoria {
 
     private final String[] arrayTopicos = {
         "Alimentacao",
         "Transporte",
-        "Imposto",
+        "Divida",
         "Salario",
+        "Auxilio",
+        "Venda",
         "Outros"
     };
 
     public String getTopico(int index) {
        return arrayTopicos[index];
     }
-
-    public double getId() {
-        return id;
-    }       
 }

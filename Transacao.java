@@ -39,7 +39,7 @@ public abstract class Transacao {
         return categoria;
     }
 
-    public abstract void aplicar(Conta conta);
+    public abstract double aplicar(Conta conta);
 
     public abstract String getTipo();
 }

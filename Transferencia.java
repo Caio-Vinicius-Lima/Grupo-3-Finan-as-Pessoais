@@ -38,8 +38,16 @@ public class Transferencia {
         if (!origem.saldo_Suficiente(valor_Transferido)) {
             return false;
         }
-
-
         return true;
+
+        @Override
+        public String getTipo() {
+            return "Transferencia";
+        }
+
+        @Override
+        public double aplicar(Conta conta) {
+            return getValor();
+        }
     }
 }

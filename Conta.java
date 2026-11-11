@@ -1,44 +1,29 @@
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Conta {
-
     private String nome;
-    private int saldo_Inicial;
-    private List<Transacao> transacoes = new ArrayList<>();
+    private double saldo_inicial;
+    private List<Transacao> transacao = new ArrayList<>();
 
-    public Conta(String nome, int saldo_Inicial) {
-        this.nome = nome;
-        this.saldo_Inicial = saldo_Inicial;
+public Conta(String nome,double saldo_inicial){
+    this.nome = nome;
+    this.saldo_inicial = saldo_inicial;
+}
+
+    public List<Transacao> getTransacao() {
+        return this.transacao;
     }
 
-    public List<Transacao> getTransacoes() {
-        return this.transacoes;
-    }
-
-    public void adicionarTransacao(Transacao transacao) {
-        transacoes.add(transacao);
+    public void adicionarTransacao(Transacao t) {
+        transacao.add(t);
     }
 
     public double getSaldoAtual() {
-        double saldo = saldo_Inicial;
-        int i = 0;
-
-        while (i < transacoes.size()) {
-
-            Transacao transacao = transacoes.get(i);
-
-            if (transacao.getTipo().equals("Entrada")) {
-                saldo += transacao.getValor();
-            }
-            else if (transacao.getTipo().equals("Saida")) {
-                saldo -= transacao.getValor();
-            }
-
-            i++;
+        double saldo = saldo_inicial;
+        for (int i = 0; i < transacao.size(); i++) {
+            saldo += transacao.get(i).aplicar(this);
         }
-
         return saldo;
     }
 
@@ -46,7 +31,28 @@ public class Conta {
         return getSaldoAtual() >= valor;
     }
 
-    public String getNome() {
-        return nome;
+    public void RemoverLinhaInteira(int linhaEspecifica){
+    
+       /* if (transacao.get(LinhaEspecifica).getTipo().equals("Receita")) {
+                saldo += t.getValor();
+            }
+            else if (t.getTipo().equals("Despesa")) {
+                saldo -= t.getValor();
+            } else {
+                saldo += ;
+            }*/
+
+        transacao.remove(linhaEspecifica);
+    }
+
+    public void MostrarLinha(int linha){
+        System.out.println(transacao.get(linha).getId());
+        System.out.println(transacao.get(linha).getData());
+        System.out.println(transacao.get(linha).getValor());
+        System.out.println(transacao.get(linha).getDescricao());
+        System.out.println(transacao.get(linha).getCategoria());
+        /*for(int a = 0;a < transacao.size();a++){
+            System.out.println("Linha " + a + " : " + transacao.get(a).getId() + " " + transacao.get(a).getData() + " " + transacao.get(a).getValor() + " " + transacao.get(a).getDescricao() + " " + transacao.get(a).getCategoria());
+        }*/
     }
 }

@@ -13,14 +13,6 @@ public class Transferencia extends Transacao {
         this.valor_Transferido = valor;
     }
 
-    public Conta getDestino() {
-        return destino;
-    }
-
-    public Conta getOrigem() {
-        return origem;
-    }
-
     public double getValor_Transferido() {
         return valor_Transferido;
     }
@@ -48,7 +40,12 @@ public class Transferencia extends Transacao {
 
     @Override
     public double aplicar(Conta conta) {
-        return getValor();
-    }
+     if (conta == origem) {
+        return -getValor();
+     }
+     if (conta == destino) {
+      return getValor();
+     }
+    return 0;
 }
 

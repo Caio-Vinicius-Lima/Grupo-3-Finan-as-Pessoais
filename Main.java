@@ -15,13 +15,12 @@ public class Main {
         System.out.println("============================ MENU ===============================");
         System.out.println("Conta atual: " + nome);
         System.out.println("\n--> Insira a primeira palavra da operação desejada:\n");
-        System.out.println("1.  Transferir "); // transferencia mesmo
+        System.out.println("1. Transferir "); // transferencia mesmo
         System.out.println("2. Relatorio"); // soma das despesas e receitas em um periodo de tempo
-        System.out.println("3. Remover"); // eu acho q isso é uma op
-        System.out.println("4. Despesa"); // basicametne perder saldo diretamente da bunda
-        System.out.println("5. Receita"); // Basicamente adicionar saldo diretamente da bunda
-        System.out.println("6. Saldo");
-        System.out.println("7. Encerrar");
+        System.out.println("3. Despesa"); // basicametne perder saldo diretamente da bunda
+        System.out.println("4. Receita"); // Basicamente adicionar saldo diretamente da bunda
+        System.out.println("5. Saldo");
+        System.out.println(6. Encerrar");
         System.out.println("=================================================================");
     }
 
@@ -51,14 +50,6 @@ public class Main {
              case "Relatorio":
                
                 // aqui precisa do relatorio
-                break;
-
-             case "Remover":
-                System.out.println("--> Digite o numero da linha que voce quer remover"); 
-                int linha = input.nextInt();
-                conta1.RemoverLinhaInteira(linha - 1);
-                System.out.println("Linha " + linha + " foi removida com sucesso");
-                // se remover uma transferencia a conta1 é reajustada mas a conta 2 não
                 break;
 
              case "Despesa":

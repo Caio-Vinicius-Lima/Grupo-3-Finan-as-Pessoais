@@ -31,20 +31,6 @@ public Conta(String nome,double saldo_inicial){
         return getSaldoAtual() >= valor;
     }
 
-    public void RemoverLinhaInteira(int linhaEspecifica){
-    
-       /* if (transacao.get(LinhaEspecifica).getTipo().equals("Receita")) {
-                saldo += t.getValor();
-            }
-            else if (t.getTipo().equals("Despesa")) {
-                saldo -= t.getValor();
-            } else {
-                saldo += ;
-            }*/
-
-        transacao.remove(linhaEspecifica);
-    }
-
     public void MostrarLinha(int linha){
         System.out.println(transacao.get(linha).getId());
         System.out.println(transacao.get(linha).getData());

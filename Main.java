@@ -51,7 +51,7 @@ public class Main {
                 System.out.println("--> Quanto que voce deseja transferir?");
                 double transferencia = input.nextDouble();
                 ColetaDados();
-                Transferencia p = new Transferencia(id,data,transferencia,("Transferencia: " + Descricao),categoria,conta1,conta2);
+                Transferencia p = new Transferencia(id,data,transferencia,(Descricao),categoria,conta1,conta2);
                 conta1.adicionarTransacao(p);
                 conta2.adicionarTransacao(p);
                 System.out.println("Foi movido um total de: " + transferencia + " reais");
@@ -101,7 +101,7 @@ public class Main {
                 System.out.println("--> Quanto que ser depositado?");
                 double despesa = input.nextDouble();
                 ColetaDados();
-                Despesa d = new Despesa(id,data,despesa,("Despesa: " + Descricao),categoria);
+                Despesa d = new Despesa(id,data,despesa,(Descricao),categoria);
                 conta1.adicionarTransacao(d);
                 System.out.println("Foi removido um total de " + despesa + " reais do seu saldo" );
                 System.out.println("seu saldo atual é de " + conta1.getSaldoAtual() + " reais");
@@ -112,7 +112,7 @@ public class Main {
                 System.out.println("--> Quanto que será recebido?");
                 double receita = input.nextDouble();
                 ColetaDados();
-                Receita r = new Receita(id,data,receita,("Receita: " + Descricao),categoria);
+                Receita r = new Receita(id,data,receita,(Descricao),categoria);
                 System.out.println("--> Quanto que ser depositado?");
                 conta1.adicionarTransacao(r);
                 System.out.println("Voce recebeu um total de " + receita + " reais do seu saldo" );

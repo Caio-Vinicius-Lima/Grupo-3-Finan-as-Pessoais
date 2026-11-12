@@ -32,7 +32,7 @@ public abstract class Transacao {
     }
 
     public String getDescricao() {
-        return descricao;
+        return getTipo() + ": " + descricao;
     }
 
     public String getCategoria() {

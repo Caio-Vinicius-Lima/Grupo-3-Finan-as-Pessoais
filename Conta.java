@@ -1,10 +1,13 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.time.YearMonth;
 
 public class Conta {
     private String nome;
     private double saldo_inicial;
     private List<Transacao> transacao = new ArrayList<>();
+
+//"Id" int | "data" LocalDate | "saldo" double | "descrisao" String | "Categoria" String --> filtro de topicos da descrição?
 
 public Conta(String nome,double saldo_inicial){
     this.nome = nome;
@@ -12,7 +15,7 @@ public Conta(String nome,double saldo_inicial){
 }
 
     public List<Transacao> getTransacao() {
-        return this.transacao;
+        return new ArrayList<>(transacao);
     }
 
     public void adicionarTransacao(Transacao t) {
@@ -27,18 +30,19 @@ public Conta(String nome,double saldo_inicial){
         return saldo;
     }
 
+    public double getSaldoAtual2(YearMonth ate) {
+        double saldo = saldo_inicial;
+        for (int i = 0; i < transacao.size(); i++) {
+        Transacao f = transacao.get(i);
+        if (!YearMonth.from(f.getData()).isAfter(ate)) {
+            saldo += f.aplicar(this);
+        }
+    }
+    return saldo;
+    }
+
     public boolean saldo_Suficiente(double valor) {
         return getSaldoAtual() >= valor;
     }
-
-    public void MostrarLinha(int linha){
-        System.out.println(transacao.get(linha).getId());
-        System.out.println(transacao.get(linha).getData());
-        System.out.println(transacao.get(linha).getValor());
-        System.out.println(transacao.get(linha).getDescricao());
-        System.out.println(transacao.get(linha).getCategoria());
-        /*for(int a = 0;a < transacao.size();a++){
-            System.out.println("Linha " + a + " : " + transacao.get(a).getId() + " " + transacao.get(a).getData() + " " + transacao.get(a).getValor() + " " + transacao.get(a).getDescricao() + " " + transacao.get(a).getCategoria());
-        }*/
     }
 }

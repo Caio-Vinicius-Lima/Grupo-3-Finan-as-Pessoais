@@ -1,52 +1,48 @@
-
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
+import java.time.YearMonth;
 
 public class Conta {
-
     private String nome;
-    private int saldo_Inicial;
-    private List<Transacao> transacoes = new ArrayList<>();
+    private double saldo_inicial;
+    private List<Transacao> transacao = new ArrayList<>();
 
-    public Conta(String nome, int saldo_Inicial) {
-        this.nome = nome;
-        this.saldo_Inicial = saldo_Inicial;
+//"Id" int | "data" LocalDate | "saldo" double | "descrisao" String | "Categoria" String --> filtro de topicos da descrição?
+
+public Conta(String nome,double saldo_inicial){
+    this.nome = nome;
+    this.saldo_inicial = saldo_inicial;
+}
+
+    public List<Transacao> getTransacao() {
+        return new ArrayList<>(transacao);
     }
 
-    public List<Transacao> getTransacoes() {
-        return this.transacoes;
-    }
-
-    public void adicionarTransacao(Transacao transacao) {
-        transacoes.add(transacao);
+    public void adicionarTransacao(Transacao t) {
+        transacao.add(t);
     }
 
     public double getSaldoAtual() {
-        double saldo = saldo_Inicial;
-        int i = 0;
-
-        while (i < transacoes.size()) {
-
-            Transacao transacao = transacoes.get(i);
-
-            if (transacao.getTipo().equals("Entrada")) {
-                saldo += transacao.getValor();
-            }
-            else if (transacao.getTipo().equals("Saida")) {
-                saldo -= transacao.getValor();
-            }
-
-            i++;
+        double saldo = saldo_inicial;
+        for (int i = 0; i < transacao.size(); i++) {
+            saldo += transacao.get(i).aplicar(this);
         }
-
         return saldo;
+    }
+
+    public double getSaldoAtual2(YearMonth ate) {
+        double saldo = saldo_inicial;
+        for (int i = 0; i < transacao.size(); i++) {
+        Transacao f = transacao.get(i);
+        if (!YearMonth.from(f.getData()).isAfter(ate)) {
+            saldo += f.aplicar(this);
+        }
+    }
+    return saldo;
     }
 
     public boolean saldo_Suficiente(double valor) {
         return getSaldoAtual() >= valor;
     }
-
-    public String getNome() {
-        return nome;
     }
 }

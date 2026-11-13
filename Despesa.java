@@ -1,8 +1,8 @@
 import java.time.LocalDate;
 
-public class despesa extends Transacao {
+public class Despesa extends Transacao {
 
-    public despesa(int id, LocalDate data, double valor, String descricao, String categoria) {
+    public Despesa(int id, LocalDate data, double valor, String descricao, String categoria) {
         super(id, data, valor, descricao, categoria);
     }
 
@@ -12,7 +12,7 @@ public class despesa extends Transacao {
     }
 
     @Override
-    public double aplicar(Conta, conta) {
+    public double aplicar(Conta conta) {
         return -getValor();
     }
 }

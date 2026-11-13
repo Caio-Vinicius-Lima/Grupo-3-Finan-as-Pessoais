@@ -32,14 +32,14 @@ public abstract class Transacao {
     }
 
     public String getDescricao() {
-        return descricao;
+        return getTipo() + ": " + descricao;
     }
 
     public String getCategoria() {
         return categoria;
     }
 
-    public abstract void aplicar(Conta conta);
+    public abstract double aplicar(Conta conta);
 
     public abstract String getTipo();
 }

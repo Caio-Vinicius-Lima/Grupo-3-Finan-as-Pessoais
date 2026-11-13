@@ -1,24 +1,16 @@
-
-public class Transferencia {
+import java.time.LocalDate;
+public class Transferencia extends Transacao {
 
     private Conta origem;
     private Conta destino;
     private double valor_Transferido;
 
-    public Transferencia(Conta origem, Conta destino,
-                         double valor_Transferido) {
+    public Transferencia(int id, LocalDate data, double valor, String descricao, String categoria,Conta origem,Conta destino) {
 
-        this.origem = origem;
+        super(id,data,valor,descricao,categoria);
         this.destino = destino;
-        this.valor_Transferido = valor_Transferido;
-    }
-
-    public Conta getDestino() {
-        return destino;
-    }
-
-    public Conta getOrigem() {
-        return origem;
+        this.origem = origem;
+        this.valor_Transferido = valor;
     }
 
     public double getValor_Transferido() {
@@ -38,8 +30,22 @@ public class Transferencia {
         if (!origem.saldo_Suficiente(valor_Transferido)) {
             return false;
         }
-
-
         return true;
     }
+
+    @Override
+    public String getTipo() {
+        return "Transferencia";
+    }
+
+    @Override
+    public double aplicar(Conta conta) {
+     if (conta == origem) {
+        return -getValor();
+     }
+     if (conta == destino) {
+      return getValor();
+     }
+    return 0;
 }
+

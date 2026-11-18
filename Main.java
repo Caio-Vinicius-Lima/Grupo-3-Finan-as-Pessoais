@@ -1,6 +1,8 @@
-import java.util.Scanner;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
 public class Main {
 
     static boolean loop = true;
@@ -13,26 +15,35 @@ public class Main {
     static int id = (int) (Math.random() * 1000000000),dia = (int) (Math.random() * 27 + 1);
 
     public static void interfaceterminal(){
+        System.out.print("\n");
         System.out.println("============================ MENU ===============================");
-        System.out.println("Conta atual: " + nome);
-        System.out.println("\n--> Insira a primeira palavra da operação desejada:\n");
-        System.out.println("1.  Transferir "); 
-        System.out.println("2. Relatorio"); 
-        System.out.println("3. Despesa");
-        System.out.println("4. Receita"); 
+        System.out.println("Conta atual: " + nome + "      Data: " + data);
+        System.out.println("\n--> Insira o numero que corresponde a operação desejada:\n");
+        System.out.println("1. Transferir "); // transferencia mesmo
+        System.out.println("2. Relatório"); // soma das despesas e receitas em um periodo de tempo
+        // System.out.println("3. Remover") eu acho q isso é uma op
+        System.out.println("3. Despesa"); // basicametne perder saldo diretamente da bunda
+        System.out.println("4. Receita"); // Basicamente adicionar saldo diretamente da bunda
         System.out.println("5. Saldo");
         System.out.println("6. Encerrar");
         System.out.println("=================================================================");
     }
 
     public static void ColetaDados(){
-        System.out.print("--> Qual é o motivo para ocorrer essa transacao?\n");
+      try{
         input.nextLine();
+        System.out.println("--> Qual é o motivo para ocorrer essa transacao?");
         Descricao = input.nextLine();
-        System.out.println("--> Em qual topico especifica você deseja inserir? (index de 1 a 7)");
+        System.out.println("--> Em qual tópico específico você deseja inserir? (número de 0 a 6)");
+        System.out.println("(Alimentação --> 0) | (Transporte --> 1) | (Divída --> 2) | (Salário --> 3) ");
+        System.out.println("          (Auxílio --> 4) | (Venda --> 5) | (Outros --> 6)");
         index = input.nextInt();
-        Categoria array = new Categoria();
-        categoria = array.getTopico(index);
+      } catch (InputMismatchException | IllegalArgumentException | ArrayIndexOutOfBoundsException e){
+         System.err.println("[ERRO]: a variável index aceita apenas inteiro de 0 a 6 para o array");
+         System.err.println("A transação foi cancelada");
+      }
+      Categoria array = new Categoria();
+      categoria = array.getTopico(index);
     }
 
      public static void AvancarTempo(){
@@ -45,86 +56,147 @@ public class Main {
       }   
    }
 
-    public static void Operacao(String operacao){
+    public static void Operacao(int operacao){
         switch(operacao){
-             case "Transferir":
-                System.out.println("--> Quanto que voce deseja transferir?");
-                double transferencia = input.nextDouble();
-                ColetaDados();
-                Transferencia p = new Transferencia(id,data,transferencia,(Descricao),categoria,conta1,conta2);
-                conta1.adicionarTransacao(p);
-                conta2.adicionarTransacao(p);
-                System.out.println("Foi movido um total de: " + transferencia + " reais");
-                System.out.println("Atualmente a conta1 possui " + conta1.getSaldoAtual() + " reais e a conta2 possui " + conta2.getSaldoAtual() + " reais");
-                maisMes += 0.5;
+             case 1:
+               System.out.println("--> Insira um valor que você deseja transferir:");
+               double transferencia = input.nextDouble();
+               ColetaDados();      
+               Transferencia p = new Transferencia(id,data,transferencia,Descricao,categoria,conta1,conta2);
+               try {
+               p.realizar_Transferencia();
+               System.out.println("Transferência Bem Sucedida! Foi movido um total de " + transferencia + " reais\n");
+               System.out.println("Atualmente a conta1 possui " + conta1.getSaldoAtual() + " reais e a ContaSecundária possui " + conta2.getSaldoAtual() + " reais");
+               maisMes += 0.5;
+                } catch(ValorInvalidoException | ContaNaoEncontradaException | SaldoInsuficienteException e){
+                  System.err.println("[ERRO] " + e.getMessage());
+                  System.err.println("Nenhum dado desta transação foi armazenado");
+                }
                 break;
 
-             case "Relatorio":
-               System.out.println("--> Antes de escolher os tipos de relatorio,preencha esses dados");
-               System.out.println("--> Se voce deseja usar o Relatorio Filtrado,o topico especifico sera selecionado nesta parte (index de 1 a 7)");
-                index = input.nextInt();
-                Categoria array = new Categoria();
-                categoria = array.getTopico(index);
-               System.out.println("--> Você deseja qual tipo de aleatorio? (digite 1 a 3)");
-               System.out.println("(Temporal --> 1) (Filtrada --> = 2) (Mensal --> = 3)");
+             case 2:
+               System.out.println("--> Antes de escolher os tipos de relatório,preencha esses dados.");
+               System.out.println("--> Se você deseja usar o Relatório Filtrado, o tópico específico será selecionado nesta parte \n");
+               System.out.println("(Alimentação --> 0) | (Transporte --> 1) | (Divída --> 2) | (Salário --> 3) ");
+               System.out.println("         (Auxílio --> 4) | (Venda --> 5) | (Outros --> 6)");
+               while(true){
+                  try{
+                     index = input.nextInt();
+                     Categoria array2 = new Categoria();
+                     categoria = array2.getTopico(index);
+                     break;
+                  } catch(ArrayIndexOutOfBoundsException e){
+                     System.err.println("[ERRO] a varíavel index aceita apenas inteiro de 0 a 6 para o array");
+                     System.err.println("A transação foi cancelada nem armazenada");
+               }}
+               System.out.println("--> Você deseja qual tipo de relatorio? (digite 1 a 3)");
+               System.out.println("(Temporal --> 1) | (Filtrada --> 2) | (Mensal -- 3)");
                int g = input.nextInt();
                YearMonth mes = YearMonth.from(data);
                Relatorio j = new Relatorio(conta1,categoria,mes,saldoinicial);
                switch(g){
                   case 1:
-                      System.out.println("--> De quais meses,respectivamente,inicio e fim,voce deseja fazer uma relatorio especifico (1 a 12)");
-                     int inicio = input.nextInt();
-                     int fim = input.nextInt();
-                     YearMonth inicio2 = YearMonth.of(2026 + maisAno,inicio);
-                     YearMonth fim2 = YearMonth.of(2026 + maisAno,fim);
-                     j.total(inicio2,fim2);
+                     while(true){
+                     try{
+                        System.out.println("--> De quais meses,respectivamente,inicio e fim,voce deseja fazer uma relatório específico (1 a 12)");
+                        int inicio = input.nextInt();
+                        int fim = input.nextInt();
+                        YearMonth inicio2 = YearMonth.of(2026 + maisAno,inicio);
+                        YearMonth fim2 = YearMonth.of(2026 + maisAno,fim);
+                        j.total(inicio2,fim2);
+                        break;
+                     } catch(InputMismatchException e){
+                        System.err.println("[ERRO] Relatório não sera fornecido agora,desde que você insira uma data com valores inteiros");
+                        input.nextLine();
+                     }}
                      break;
                   case 2:
-                     System.out.println("--> Selecione um mes para ver o relatorio mensal (1 a 12)");
-                     inicio = input.nextInt();
-                     mes = YearMonth.of(2026 + maisAno,inicio);
-                     j.total(mes,categoria);
+                     System.out.println("--> Selecione um mês para ver o relatorio mensal (1 a 12)");
+                     while(true){
+                     try {
+                        int inicio = input.nextInt();
+                        mes = YearMonth.of(2026 + maisAno,inicio);
+                        j.total(mes,categoria);
+                        break;
+                        } catch (InputMismatchException e){
+                           System.err.println("[ERRO] Relatório não sera fornecido agora,desde que você insira uma data com valores inteiros");
+                           input.nextLine();
+                     }}
                      break;
                   case 3:
-                     System.out.println("--> Selecione um mes para ver o relatorio mensal (1 a 12)");
-                     inicio = input.nextInt();
-                     mes = YearMonth.of(2026 + maisAno,inicio);
-                     j.total(mes);
+                     try{
+                        System.out.println("--> Selecione um mês para ver o relatório mensal (1 a 12)");
+                        int inicio = input.nextInt();
+                        if(inicio > 12 || inicio <= 0){
+                           throw new IllegalArgumentException();
+                        }
+                        mes = YearMonth.of(2026 + maisAno,inicio);
+                        j.total(mes);
+                        break;
+                     } catch(IllegalArgumentException e){
+                        System.err.println("[ERRO] Relatório não será fornecido agora,desde que você insira uma data com valores inteiros");
+                        input.nextLine();
+                     }
                      break;
                   default:
                      loop = false;
                      break;
-               }
-                break;
+                  }
+                  break;
 
-             case "Despesa":
-                System.out.println("--> Quanto que ser depositado?");
-                double despesa = input.nextDouble();
+             /* case "Remover":
+                System.out.println("--> Digite o numero da linha que voce quer remover"); 
+                int linha = input.nextInt();
+                conta1.RemoverLinhaInteira(linha - 1);
+                System.out.println("Linha " + linha + " foi removida com sucesso");
+                // se remover uma transferencia a conta1 é reajustada mas a conta 2 não
+                break; */
+
+            case 3:
+               System.out.println("--> Quanto que ser depositado?");
+               double despesa = input.nextDouble();
+               try{
+                 if(despesa <= 0){
+                  throw new ValorInvalidoException("O valor da transferência deve ser maior que zero.");
+                } else if (despesa > conta1.getSaldoAtual()) {
+                  throw new SaldoInsuficienteException("Você não tem a quantidade necessária para depositar esse dinheiro.");
+                }
                 ColetaDados();
-                Despesa d = new Despesa(id,data,despesa,(Descricao),categoria);
+                Despesa d = new Despesa(id,data,despesa,Descricao,categoria);
                 conta1.adicionarTransacao(d);
                 System.out.println("Foi removido um total de " + despesa + " reais do seu saldo" );
                 System.out.println("seu saldo atual é de " + conta1.getSaldoAtual() + " reais");
                 maisMes += 0.5;
+                } catch(ValorInvalidoException | SaldoInsuficienteException e){
+                  System.err.println("[ERRO] Despesa não registada: " + e.getMessage());
+                }
                 break;
 
-             case "Receita":
+             case 4:
                 System.out.println("--> Quanto que será recebido?");
                 double receita = input.nextDouble();
+                try{
+                  if(receita <= 0){
+                  throw new ValorInvalidoException("O valor da receita tem de ser maior que zero.");
+                }
                 ColetaDados();
-                Receita r = new Receita(id,data,receita,(Descricao),categoria);
+                Receita r = new Receita(id,data,receita,Descricao,categoria);
                 System.out.println("--> Quanto que ser depositado?");
                 conta1.adicionarTransacao(r);
                 System.out.println("Voce recebeu um total de " + receita + " reais do seu saldo" );
                 System.out.println("seu saldo atual é de " + conta1.getSaldoAtual() + " reais");
                 maisMes += 0.5;
+                }
+                catch(ValorInvalidoException e){
+                  System.err.println("[ERRO] Receita não registada: " + e.getMessage());
+                }
                 break;
 
-             case "Saldo":
+             case 5:
                 System.out.println("seu saldo da " + nome + " é de " + conta1.getSaldoAtual() + " reais e a conta2 é de " + conta2.getSaldoAtual());
                 break;
 
-             case "Encerrar":
+             case 6:
                 loop = false;
                 break;
 
@@ -137,19 +209,43 @@ public class Main {
     public static void main(String[] args){
 
         System.out.println("============================= Cadastro =============================");
-        System.out.println("     Digite primeiro o seu nome e o seu saldo bancario inicial");
-        nome = input.nextLine();
-        saldoinicial = input.nextDouble();
-        System.out.println("");
+        while(true){
+         System.out.println("--> Digite primeiro o seu nome");
+         nome = input.nextLine();
+
+         if (nome.matches(".*\\d.*")) {
+            System.out.println("[ERRO] Não insira números neste campo. Digite apenas texto.");
+         } else{
+            break;
+         }}
+
+         while(true){
+         try{
+           System.out.println("--> e agora o seu saldo bancário inicial");
+           saldoinicial = input.nextDouble();
+           if(saldoinicial <= 0 ){
+            throw new ValorInvalidoException(" a variável saldo inicial não aceita números negativos/nulos nesta operação");
+           }
+           break;
+         } catch(ValorInvalidoException e){
+            System.err.println("[ERRO] " + e.getMessage() + ",tente novamente");
+         } catch(InputMismatchException e){
+            System.err.println("[ERRO] você digitou uma string para um valor numérico. Por favor,digite apenas valores inteiros");
+            input.nextLine();
+         }}
+
         conta1 = new Conta(nome,saldoinicial);
-        conta2 = new Conta("Conta2",0);
-        
+        conta2 = new Conta("ContaSecundária",0);
+
         while(loop){
-        AvancarTempo();
-        interfaceterminal();
-        input.nextLine();
-        String digita = input.nextLine();
-        Operacao(digita);
-    }
-}
-}
+         AvancarTempo();
+         interfaceterminal();
+         try{
+            int digita = input.nextInt();
+            Operacao(digita);
+        } catch(InputMismatchException e){
+         System.err.println("[ERRO] apenas os numeros de 1 a 7 são validos nesta operação");
+         input.nextLine();
+        }
+   }}
+   }

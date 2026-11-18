@@ -1,11 +1,11 @@
 public class Categoria {
 
     private final String[] arrayTopicos = {
-        "Alimentacao",
+        "Alimentação",
         "Transporte",
-        "Divida",
-        "Salario",
-        "Auxilio",
+        "Dívida",
+        "Salário",
+        "Auxílio",
         "Venda",
         "Outros"
     };

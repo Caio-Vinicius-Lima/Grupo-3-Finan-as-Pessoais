@@ -12,25 +12,23 @@ public class Transferencia extends Transacao {
         this.origem = origem;
         this.valor_Transferido = valor;
     }
-
-    public double getValor_Transferido() {
-        return valor_Transferido;
-    }
-
-    public boolean realizar_Transferencia() {
-
+    
+     public void realizar_Transferencia() throws ValorInvalidoException, ContaNaoEncontradaException, SaldoInsuficienteException {
+        
         if (valor_Transferido <= 0) {
-            return false;
+            throw new ValorInvalidoException("O valor da transferência deve ser maior que zero.");
         }
-
-        if (origem == destino) {
-            return false;
+        
+        if (origem == null || destino == null || origem == destino) {
+            throw new ContaNaoEncontradaException("As contas de origem e destino devem existir e ser diferentes.");
         }
-
+        
         if (!origem.saldo_Suficiente(valor_Transferido)) {
-            return false;
+            throw new SaldoInsuficienteException("A conta não tem saldo suficiente para esta operação.");
         }
-        return true;
+
+        origem.adicionarTransacao(this);
+        destino.adicionarTransacao(this);
     }
 
     @Override
@@ -40,12 +38,15 @@ public class Transferencia extends Transacao {
 
     @Override
     public double aplicar(Conta conta) {
-     if (conta == origem) {
-        return -getValor();
-     }
-     if (conta == destino) {
+    if (conta == origem) {
+      return -getValor();
+    }
+    if (conta == destino) {
       return getValor();
-     }
+    }
     return 0;
+    }
 }
+
+
 

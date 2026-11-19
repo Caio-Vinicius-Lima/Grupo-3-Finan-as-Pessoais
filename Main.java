@@ -42,8 +42,7 @@ public class Main {
          System.err.println("[ERRO]: a variável index aceita apenas inteiro de 0 a 6 para o array");
          System.err.println("A transação foi cancelada");
       }
-      Categoria array = new Categoria();
-      categoria = array.getTopico(index);
+      categoria = Categoria.getTopico(index);
     }
 
      public static void AvancarTempo(){
@@ -82,8 +81,7 @@ public class Main {
                while(true){
                   try{
                      index = input.nextInt();
-                     Categoria array2 = new Categoria();
-                     categoria = array2.getTopico(index);
+                     categoria = Categoria.getTopico(index);
                      break;
                   } catch(ArrayIndexOutOfBoundsException e){
                      System.err.println("[ERRO] a varíavel index aceita apenas inteiro de 0 a 6 para o array");

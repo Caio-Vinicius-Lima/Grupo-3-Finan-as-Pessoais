@@ -1,6 +1,6 @@
 public class Categoria {
 
-    private final String[] arrayTopicos = {
+    private static final String[] arrayTopicos = {
         "Alimentação",
         "Transporte",
         "Dívida",
@@ -10,7 +10,7 @@ public class Categoria {
         "Outros"
     };
 
-    public String getTopico(int index) {
+    public static String getTopico(int index) {
        return arrayTopicos[index];
     }
 }

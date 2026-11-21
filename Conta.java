@@ -44,5 +44,4 @@ public Conta(String nome,double saldo_inicial){
     public boolean saldo_Suficiente(double valor) {
         return getSaldoAtual() >= valor;
     }
-    }
 }

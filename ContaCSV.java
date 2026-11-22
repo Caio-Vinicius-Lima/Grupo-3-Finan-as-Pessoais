@@ -2,6 +2,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.FileWriter;
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.io.FileReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -10,16 +12,16 @@ import java.util.List;
 
 public class ContaCSV{
 
-    private static final String ArquivoArrayList = "/Users/italo/Inferno/Java/TrabalhodeProgramação/classesPrincipais/ArquivoArrayList.csv"; 
+    private static final String ArquivoArrayList = System.getProperty("user.dir");
+    private static final File Arquivo = new File(ArquivoArrayList, "ArquivoArraylist.csv");
     private static String linha,nome;
     private static double saldo;
     private static boolean primeiraLinha = true;
+
     public static void Adicionar(Transacao t){
        
         try{
-            FileWriter escrever = new FileWriter(ArquivoArrayList,StandardCharsets.UTF_8,true);
-            BufferedReader ler = new BufferedReader(new FileReader(ArquivoArrayList));
-            boolean arquivoExiste = new File(ArquivoArrayList).exists();
+            FileWriter escrever = new FileWriter(Arquivo,StandardCharsets.UTF_8,true);
             escrever.write(t.getId() + ";" + t.getData() + ";" + t.getValor() + ";" + t.getDescricao() + ";" + t.getCategoria() + "\n");
             escrever.flush();
             escrever.close();
@@ -32,7 +34,7 @@ public class ContaCSV{
         List<Transacao> transacao = new ArrayList<>();
 
         try{
-            BufferedReader ler = new BufferedReader(new FileReader(ArquivoArrayList));
+            BufferedReader ler = new BufferedReader(new FileReader(Arquivo));
             primeiraLinha = true;
            
             while((linha = ler.readLine()) != null){
@@ -74,31 +76,14 @@ public class ContaCSV{
         return transacao;
     }
 
-    public static void ApagarArquivo(){
-        try{
-            BufferedReader ler = new BufferedReader(new FileReader(ArquivoArrayList));
-            while((linha = ler.readLine()) != null){
-                if (primeiraLinha) {
-                    primeiraLinha = false;
-                    continue;
-                }
-            
-            
-            }
-            primeiraLinha = true;
-            ler.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
     public static void LerCadastro(){
     nome = null;
     saldo = 0;
-    File arquivo = new File(ArquivoArrayList);
-    if (!arquivo.exists()) return;    
+    if (!Arquivo.exists()){ 
+        return;
+    }    
         try{
-            BufferedReader ler = new BufferedReader(new FileReader(ArquivoArrayList));
+            BufferedReader ler = new BufferedReader(new FileReader(Arquivo));
             String primeira = ler.readLine();
             if (primeira == null) return;  
             String Lerlinha[] = primeira.split(";");
@@ -118,45 +103,60 @@ public class ContaCSV{
         return saldo;
     }
 
-    public static void Existencia() throws ArquivoDadosException{
-        boolean arquivoExiste = new File(ArquivoArrayList).exists();
-        if(!arquivoExiste){  
-        throw new ArquivoDadosException("[ERRO] o arquivo nãoe xiste"); 
+    public static void Existencia() throws ArquivoDadosException,IOException{
+        if (!Arquivo.isFile()) {
+        throw new ArquivoDadosException("[ERRO] o arquivo não existe"); 
     }}
+
+    public static void CriarArquivo(){
+        try{
+        Path caminho = Arquivo.toPath();
+        Files.createDirectories(caminho.getParent());
+        if (Files.notExists(caminho)) {
+            Files.createFile(caminho);
+        }} catch(IOException e){
+            System.err.println("[ERRO] " + e.getMessage());
+        }}
 
     public static void Cadastrar(String nome,double saldo) {
             try{
-            BufferedReader ler = new BufferedReader(new FileReader(ArquivoArrayList));
+            BufferedReader ler = new BufferedReader(new FileReader(Arquivo));
             List<String> linhas = new ArrayList<>();
-            Existencia();
             while ((linha = ler.readLine()) != null) {
                linhas.add(linha);
             }
+            ler.close();
 
             String cadastro = "Id;data;valor;descricao;categoria;"+ nome + ";" + saldo;
             if (linhas.isEmpty()) {
-                    linhas.add(cadastro);
+                linhas.add(cadastro);
             } else {
                 linhas.set(0, cadastro);
             }
 
-            FileWriter escrever = new FileWriter(ArquivoArrayList, StandardCharsets.UTF_8,false);
+            FileWriter escrever = new FileWriter(Arquivo, StandardCharsets.UTF_8,false);
             for (int i = 0; i < linhas.size(); i++) {
                 escrever.write(linhas.get(i) + "\n");
                 }
             escrever.close();
-            ler.close();
-            } catch (IOException | ArquivoDadosException e) {
-                    e.printStackTrace();
-                    System.err.println(e.getMessage());
-                }
-            }
+            } catch(IOException e){
+                System.err.println("[ERRO] " + e.getMessage());
+            }}
 
-        public static void RemoverLinha(){
-        /*List<String> linhas = Files.readAllLines(ArquivoArrayList, StandardCharsets.UTF_8);
+        /*public static void RemoverTransacao(){
+        List<String> linhas = Files.readAllLines(Path.of("ArquivoArrayList,csv"), StandardCharsets.UTF_8);
+        // descobri que existe um File mais moderno e muito mais fácil de mexer do que eesse
         for(int indice = 0; indice < linhas.size(); linhas++){
             
         }*/
+
+    public static void ApagarArquivo() throws ArquivoDadosException,IOException {
+        
+        boolean deletar = Files.deleteIfExists(Arquivo.toPath());
+        if(deletar == false){
+            throw new ArquivoDadosException("O arquivo não está nesta pasta ou nem existe");
+        } else{
+            System.out.println("Arquivo apagado com sucesso");
+        }
     }
 }
-

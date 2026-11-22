@@ -2,6 +2,7 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.InputMismatchException;
 import java.util.Scanner;
+import java.io.IOException;
 
 public class Main {
 
@@ -21,11 +22,12 @@ public class Main {
         System.out.println("\n--> Insira o numero que corresponde a operação desejada:\n");
         System.out.println("1. Transferir "); // transferencia mesmo
         System.out.println("2. Relatório"); // soma das despesas e receitas em um periodo de tempo
-        // System.out.println("3. Remover") eu acho q isso é uma op
         System.out.println("3. Despesa"); // basicametne perder saldo diretamente da bunda
         System.out.println("4. Receita"); // Basicamente adicionar saldo diretamente da bunda
         System.out.println("5. Saldo");
-        System.out.println("6. Encerrar");
+        System.out.println("6. Remover uma transação");
+        System.out.println("7. Apagar a Conta (Arquivo)");
+        System.out.println("8. Encerrar");
         System.out.println("=================================================================");
     }
 
@@ -64,6 +66,7 @@ public class Main {
                Transferencia p = new Transferencia(id,data,transferencia,Descricao,categoria,conta1,conta2);
                try {
                p.realizar_Transferencia();
+               ContaCSV.Adicionar(p);
                System.out.println("Transferência Bem Sucedida! Foi movido um total de " + transferencia + " reais\n");
                System.out.println("Atualmente a conta1 possui " + conta1.getSaldoAtual() + " reais e a ContaSecundária possui " + conta2.getSaldoAtual() + " reais");
                maisMes += 0.5;
@@ -142,14 +145,6 @@ public class Main {
                   }
                   break;
 
-             /* case "Remover":
-                System.out.println("--> Digite o numero da linha que voce quer remover"); 
-                int linha = input.nextInt();
-                conta1.RemoverLinhaInteira(linha - 1);
-                System.out.println("Linha " + linha + " foi removida com sucesso");
-                // se remover uma transferencia a conta1 é reajustada mas a conta 2 não
-                break; */
-
             case 3:
                System.out.println("--> Quanto que ser depositado?");
                double despesa = input.nextDouble();
@@ -162,6 +157,7 @@ public class Main {
                 ColetaDados();
                 Despesa d = new Despesa(id,data,despesa,Descricao,categoria);
                 conta1.adicionarTransacao(d);
+                ContaCSV.Adicionar(d);
                 System.out.println("Foi removido um total de " + despesa + " reais do seu saldo" );
                 System.out.println("seu saldo atual é de " + conta1.getSaldoAtual() + " reais");
                 maisMes += 0.5;
@@ -179,7 +175,7 @@ public class Main {
                 }
                 ColetaDados();
                 Receita r = new Receita(id,data,receita,Descricao,categoria);
-                System.out.println("--> Quanto que ser depositado?");
+                ContaCSV.Adicionar(r);
                 conta1.adicionarTransacao(r);
                 System.out.println("Voce recebeu um total de " + receita + " reais do seu saldo" );
                 System.out.println("seu saldo atual é de " + conta1.getSaldoAtual() + " reais");
@@ -191,13 +187,34 @@ public class Main {
                 break;
 
              case 5:
-                System.out.println("seu saldo da " + nome + " é de " + conta1.getSaldoAtual() + " reais e a conta2 é de " + conta2.getSaldoAtual());
-                break;
+               System.out.println("seu saldo da " + nome + " é de " + conta1.getSaldoAtual() + " reais e a conta2 é de " + conta2.getSaldoAtual());
+               break;
 
              case 6:
-                loop = false;
-                break;
+               /*System.out.println("--> Digite o numero da linha que voce quer remover"); 
+               try{
+               int linha = input.nextInt();
+               conta1.RemoverLinhaInteira(linha - 1);
+               System.out.println("Linha " + linha + " foi removida com sucesso");
+               } catch(ArrayIndexOutOfBoundsException e){
+                  System.err.println("[ERRO] a varíavel index aceita apenas inteiros ou essa linha ainda não foi registrada");
+               } catch(ContaNaoEncontradaException e){
+                  System.err.println("[ERRO] " + e.getMessage() + ",tente novamente");
+               }
+               break;*/
 
+             case 7:
+               try{
+                  ContaCSV.ApagarArquivo();
+                  loop = false;
+                  System.out.println("Reiniciando o aplicativo...");
+               } catch (ArquivoDadosException | IOException e) {
+               System.err.println("[ERRO] " + e.getMessage());
+               }
+               break;
+             case 8:
+               loop = false;
+               break;
              default:
                 System.out.println("Essa opção não existe tente novamente");
                 break;
@@ -205,8 +222,22 @@ public class Main {
     }
 
     public static void main(String[] args){
-
         System.out.println("============================= Cadastro =============================");
+
+        try{
+            ContaCSV.Existencia();
+            ContaCSV.LerCadastro();
+
+            if (ContaCSV.getNomeCadastro() != null) {
+            nome = ContaCSV.getNomeCadastro();
+            saldoinicial = ContaCSV.getSaldoCadastro();
+         }} catch(ArquivoDadosException | IOException e){
+            System.err.println(e.getMessage());
+            System.err.println("Criando Arquivo novamente...");
+            ContaCSV.CriarArquivo();
+        }  
+
+        if(nome == null && saldoinicial == 0){
         while(true){
          System.out.println("--> Digite primeiro o seu nome");
          nome = input.nextLine();
@@ -231,9 +262,12 @@ public class Main {
             System.err.println("[ERRO] você digitou uma string para um valor numérico. Por favor,digite apenas valores inteiros");
             input.nextLine();
          }}
+         ContaCSV.Cadastrar(nome,saldoinicial);
+         }
 
-        conta1 = new Conta(nome,saldoinicial);
-        conta2 = new Conta("ContaSecundária",0);
+         conta1 = new Conta(nome,saldoinicial);
+         conta2 = new Conta("ContaSecundária",0);
+         conta1.recuperarTransacao();
 
         while(loop){
          AvancarTempo();

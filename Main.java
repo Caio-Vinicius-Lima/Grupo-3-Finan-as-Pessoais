@@ -20,12 +20,12 @@ public class Main {
         System.out.println("============================ MENU ===============================");
         System.out.println("Conta atual: " + nome + "      Data: " + data);
         System.out.println("\n--> Insira o numero que corresponde a operação desejada:\n");
-        System.out.println("1. Transferir "); // transferencia mesmo
-        System.out.println("2. Relatório"); // soma das despesas e receitas em um periodo de tempo
-        System.out.println("3. Despesa"); // basicametne perder saldo diretamente da bunda
-        System.out.println("4. Receita"); // Basicamente adicionar saldo diretamente da bunda
-        System.out.println("5. Saldo");
-        System.out.println("6. Remover uma transação");
+        System.out.println("1. Transferir ");
+        System.out.println("2. Relatório");
+        System.out.println("3. Despesa"); 
+        System.out.println("4. Receita"); 
+        System.out.println("5. Ver Saldo e Todas as Transações");
+        System.out.println("6. Editar Transações");
         System.out.println("7. Apagar a Conta (Arquivo)");
         System.out.println("8. Encerrar");
         System.out.println("=================================================================");
@@ -59,7 +59,8 @@ public class Main {
 
     public static void Operacao(int operacao){
         switch(operacao){
-             case 1:
+             case 1: 
+               id = (int) (Math.random() * 1000000000);
                System.out.println("--> Insira um valor que você deseja transferir:");
                double transferencia = input.nextDouble();
                ColetaDados();      
@@ -88,7 +89,7 @@ public class Main {
                      break;
                   } catch(ArrayIndexOutOfBoundsException e){
                      System.err.println("[ERRO] a varíavel index aceita apenas inteiro de 0 a 6 para o array");
-                     System.err.println("A transação foi cancelada nem armazenada");
+                     System.err.println("Por ora,a transação foi cancelada,mas desde que voce digite no intervalo correto,ela vai continuar");
                }}
                System.out.println("--> Você deseja qual tipo de relatorio? (digite 1 a 3)");
                System.out.println("(Temporal --> 1) | (Filtrada --> 2) | (Mensal -- 3)");
@@ -140,12 +141,13 @@ public class Main {
                      }
                      break;
                   default:
-                     loop = false;
+                     System.out.println("Essa opção não existe tente novamente, escolhendo os valores certos para executar a operação");
                      break;
                   }
                   break;
 
             case 3:
+               id = (int) (Math.random() * 1000000000);
                System.out.println("--> Quanto que ser depositado?");
                double despesa = input.nextDouble();
                try{
@@ -167,19 +169,20 @@ public class Main {
                 break;
 
              case 4:
-                System.out.println("--> Quanto que será recebido?");
-                double receita = input.nextDouble();
+               id = (int) (Math.random() * 1000000000);
+               System.out.println("--> Quanto que será recebido?");
+               double receita = input.nextDouble();
                 try{
                   if(receita <= 0){
                   throw new ValorInvalidoException("O valor da receita tem de ser maior que zero.");
-                }
-                ColetaDados();
-                Receita r = new Receita(id,data,receita,Descricao,categoria);
-                ContaCSV.Adicionar(r);
-                conta1.adicionarTransacao(r);
-                System.out.println("Voce recebeu um total de " + receita + " reais do seu saldo" );
-                System.out.println("seu saldo atual é de " + conta1.getSaldoAtual() + " reais");
-                maisMes += 0.5;
+                  }
+                  ColetaDados();
+                  Receita r = new Receita(id,data,receita,Descricao,categoria);
+                  ContaCSV.Adicionar(r);
+                  conta1.adicionarTransacao(r);
+                  System.out.println("Voce recebeu um total de " + receita + " reais do seu saldo" );
+                  System.out.println("seu saldo atual é de " + conta1.getSaldoAtual() + " reais");
+                  maisMes += 0.5;
                 }
                 catch(ValorInvalidoException e){
                   System.err.println("[ERRO] Receita não registada: " + e.getMessage());
@@ -187,27 +190,46 @@ public class Main {
                 break;
 
              case 5:
-               System.out.println("seu saldo da " + nome + " é de " + conta1.getSaldoAtual() + " reais e a conta2 é de " + conta2.getSaldoAtual());
+               conta1.MostrarTransacoes();
+               System.out.println("Seu saldo da " + nome + " é de " + conta1.getSaldoAtual() + " reais e a conta2 é de " + conta2.getSaldoAtual());
                break;
 
              case 6:
-               /*System.out.println("--> Digite o numero da linha que voce quer remover"); 
                try{
-               int linha = input.nextInt();
-               conta1.RemoverLinhaInteira(linha - 1);
-               System.out.println("Linha " + linha + " foi removida com sucesso");
-               } catch(ArrayIndexOutOfBoundsException e){
-                  System.err.println("[ERRO] a varíavel index aceita apenas inteiros ou essa linha ainda não foi registrada");
-               } catch(ContaNaoEncontradaException e){
-                  System.err.println("[ERRO] " + e.getMessage() + ",tente novamente");
-               }
-               break;*/
+                  ContaCSV.Existencia();
+                  System.out.println("--> Qual opção deseja fazer?");
+                  System.out.println("(1 --> Remover Transação) | (2 --> Adicionar Transação");
+                  int z = input.nextInt();
+                  switch(z){
+                     case 1:
+                        ContaCSV.RemoverTransacaoArquivo(conta1);
+                     break;
+
+                     case 2:
+                        ContaCSV.AlterarTransacaoArquivo(conta1,conta2);
+                     break;
+
+                     default:
+                        System.out.println("Não existe essa ação,por ora essa operação vai ser cancelada");
+                     break;
+                  }} catch(ArquivoDadosException | IOException e){
+                     System.err.println("[ERRO] " + e.getMessage() + ",tente novamente");
+                  }
+                  break;
 
              case 7:
                try{
+                  System.out.println("--> Tem certeza mesmo? você vai perder o cadastro e todas as transações armazenadas até agora.");
+                  System.out.println(" (Digite - true - para apagar) | (Digite - false - para cancelar a operação)");
+                  input.nextLine();
+                  String parse = input.nextLine();
+                  if(parse.equals("true")){
                   ContaCSV.ApagarArquivo();
                   loop = false;
                   System.out.println("Reiniciando o aplicativo...");
+                  } else {
+                     break;
+                  }
                } catch (ArquivoDadosException | IOException e) {
                System.err.println("[ERRO] " + e.getMessage());
                }
@@ -222,8 +244,6 @@ public class Main {
     }
 
     public static void main(String[] args){
-        System.out.println("============================= Cadastro =============================");
-
         try{
             ContaCSV.Existencia();
             ContaCSV.LerCadastro();
@@ -231,38 +251,39 @@ public class Main {
             if (ContaCSV.getNomeCadastro() != null) {
             nome = ContaCSV.getNomeCadastro();
             saldoinicial = ContaCSV.getSaldoCadastro();
-         }} catch(ArquivoDadosException | IOException e){
+         }} catch(ArquivoDadosException e){
             System.err.println(e.getMessage());
             System.err.println("Criando Arquivo novamente...");
             ContaCSV.CriarArquivo();
         }  
 
         if(nome == null && saldoinicial == 0){
-        while(true){
-         System.out.println("--> Digite primeiro o seu nome");
-         nome = input.nextLine();
-
-         if (nome.matches(".*\\d.*")) {
-            System.out.println("[ERRO] Não insira números neste campo. Digite apenas texto.");
-         } else{
-            break;
-         }}
-
+         System.out.println("============================= Cadastro =============================");
          while(true){
-         try{
-           System.out.println("--> e agora o seu saldo bancário inicial");
-           saldoinicial = input.nextDouble();
-           if(saldoinicial <= 0 ){
-            throw new ValorInvalidoException(" a variável saldo inicial não aceita números negativos/nulos nesta operação");
-           }
-           break;
-         } catch(ValorInvalidoException e){
-            System.err.println("[ERRO] " + e.getMessage() + ",tente novamente");
-         } catch(InputMismatchException e){
-            System.err.println("[ERRO] você digitou uma string para um valor numérico. Por favor,digite apenas valores inteiros");
-            input.nextLine();
-         }}
-         ContaCSV.Cadastrar(nome,saldoinicial);
+            System.out.println("--> Digite primeiro o seu nome");
+            nome = input.nextLine();
+
+            if (nome.matches(".*\\d.*")) {
+               System.out.println("[ERRO] Não insira números neste campo. Digite apenas texto.");
+            } else{
+               break;
+            }}
+
+            while(true){
+            try{
+               System.out.println("--> e agora o seu saldo bancário inicial");
+               saldoinicial = input.nextDouble();
+               if(saldoinicial <= 0 ){
+                  throw new ValorInvalidoException(" a variável saldo inicial não aceita números negativos/nulos nesta operação");
+               }
+               break;
+            } catch(ValorInvalidoException e){
+               System.err.println("[ERRO] " + e.getMessage() + ",tente novamente");
+            } catch(InputMismatchException e){
+               System.err.println("[ERRO] você digitou uma string para um valor numérico. Por favor,digite apenas valores inteiros");
+               input.nextLine();
+            }}
+            ContaCSV.Cadastrar(nome,saldoinicial);
          }
 
          conta1 = new Conta(nome,saldoinicial);
@@ -275,7 +296,7 @@ public class Main {
          try{
             int digita = input.nextInt();
             Operacao(digita);
-        } catch(InputMismatchException e){
+         } catch(InputMismatchException e){
          System.err.println("[ERRO] apenas os numeros de 1 a 7 são validos nesta operação");
          input.nextLine();
         }

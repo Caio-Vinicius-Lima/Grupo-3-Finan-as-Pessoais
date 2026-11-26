@@ -7,8 +7,6 @@ public class Conta {
     private double saldo_inicial;
     private List<Transacao> transacao = new ArrayList<>();
 
-//"Id" int | "data" LocalDate | "saldo" double | "descrisao" String | "Categoria" String --> filtro de topicos da descrição?
-
 public Conta(String nome,double saldo_inicial){
     this.nome = nome;
     this.saldo_inicial = saldo_inicial;
@@ -18,8 +16,37 @@ public Conta(String nome,double saldo_inicial){
         return new ArrayList<>(transacao);
     }
 
+    public void recuperarTransacao(){
+        transacao = ContaCSV.Recuperar(this,this);
+    }
+
     public void adicionarTransacao(Transacao t) {
         transacao.add(t);
+    }
+
+    public void removerTransacao(int index){
+        transacao.remove(index - 1);
+    }
+
+    public void alterarTransacao(int index,Transacao t){
+        transacao.set(index - 1,t);
+    }
+
+    public void substituirTransacoes(List<Transacao> t){
+        transacao.clear();
+        transacao.addAll(t);
+    }
+
+    public void MostrarTransacoes(){
+
+        if (transacao.size() <= 0) {
+            System.out.println("Não há transações para ver");
+            return;
+        }
+
+        for(int i = 0; i < transacao.size();i++){
+            System.out.println("Transação " + (i+1) + ": " + "Id --> " + transacao.get(i).getId() + " | Data --> " + transacao.get(i).getData() + " | valor --> " + transacao.get(i).getValor() + " | descrição --> " + transacao.get(i).getDescricao() + " | categoria --> " + transacao.get(i).getCategoria());
+        }
     }
 
     public double getSaldoAtual() {

@@ -18,10 +18,11 @@ public class ContaCSV{
     private static final File Arquivo = new File(ArquivoArrayList, "ArquivoArraylist.csv");
     private static String linha,nome;
     private static double saldo;
+    private static int maisAno,maisMes;
+    private static LocalDate data;
     private static boolean primeiraLinha = true;
 
     public static void Adicionar(Transacao t){
-       
         try{
             FileWriter escrever = new FileWriter(Arquivo,StandardCharsets.UTF_8,true);
             escrever.write(t.getId() + ";" + t.getData() + ";" + t.getValor() + ";" + t.getDescricao() + ";" + t.getCategoria() + "\n");
@@ -84,12 +85,16 @@ public class ContaCSV{
         try{
             BufferedReader ler = new BufferedReader(new FileReader(Arquivo));
             String primeira = ler.readLine();
-            if (primeira == null){
-                return;  
-            }
+                if (primeira == null){
+                    return;  
+                }
             String Lerlinha[] = primeira.split(";");
             nome = Lerlinha[5];
             saldo = Double.valueOf(Lerlinha[6]);
+            data = LocalDate.parse(Lerlinha[7]);
+            maisMes = Integer.parseInt(Lerlinha[8]);
+            maisAno = Integer.parseInt(Lerlinha[9]);
+
         } catch (IOException | NumberFormatException | ArrayIndexOutOfBoundsException e) {
             saldo = 0;
             nome = null;
@@ -104,6 +109,18 @@ public class ContaCSV{
         return saldo;
     }
 
+    public static int getMaisMes(){
+        return maisMes;
+    }
+
+    public static int getMaisAno(){
+        return maisAno;
+    }
+
+    public static LocalDate getData(){
+        return data;
+    }
+
     public static void Existencia() throws ArquivoDadosException{
         if (!Arquivo.isFile()) {
         throw new ArquivoDadosException("[ERRO] o arquivo não existe"); 
@@ -111,15 +128,32 @@ public class ContaCSV{
 
     public static void CriarArquivo(){
         try{
-        Path caminho = Arquivo.toPath();
-        Files.createDirectories(caminho.getParent());
-        if (Files.notExists(caminho)) {
-            Files.createFile(caminho);
-        }} catch(IOException e){
-            System.err.println("[ERRO] " + e.getMessage());
-        }}
+            Files.createDirectories(Arquivo.toPath().getParent());
 
-    public static void Cadastrar(String nome,double saldo) {
+            if (Files.notExists(Arquivo.toPath())) {
+                Files.createFile(Arquivo.toPath());
+             }
+        } catch(IOException e){
+            System.err.println("[ERRO] " + e.getMessage());
+    }}
+
+    public static void AtualizarData(String nome, double saldo, LocalDate data, int mes, int ano){
+        try{
+            List<String> linhas = new ArrayList(Files.readAllLines(Path.of("ArquivoArrayList.csv"), StandardCharsets.UTF_8));
+            String novaLinha = "Id;data;valor;descricao;categoria;" + nome + ";" + saldo + ";" + data + ";" + mes + ";" + ano;
+
+            if (!Arquivo.isFile()) {
+                throw new ArquivoDadosException("[ERRO] o arquivo não existe"); 
+            }
+
+            linhas.set(0, novaLinha);
+            Files.write(Path.of("ArquivoArrayList.csv"),linhas,StandardCharsets.UTF_8);
+        } catch(ArquivoDadosException | IOException e){
+            System.err.println("[ERRO] " + e.getMessage());
+        }
+    }
+
+    public static void Cadastrar(String nome,double saldo,LocalDate data,int mes,int ano){
             try{
             BufferedReader ler = new BufferedReader(new FileReader(Arquivo));
             List<String> linhas = new ArrayList<>();
@@ -128,7 +162,15 @@ public class ContaCSV{
             }
             ler.close();
 
-            String cadastro = "Id;data;valor;descricao;categoria;"+ nome + ";" + saldo;
+            if(data == null){
+                data = LocalDate.now();
+            }
+
+            if(maisMes == 0){
+                maisMes = 1;
+            }
+
+            String cadastro = "Id;data;valor;descricao;categoria;" + nome + ";" + saldo + ";" + data + ";" + mes + ";" + ano;
             if (linhas.isEmpty()) {
                 linhas.add(cadastro);
             } else {
@@ -166,58 +208,54 @@ public class ContaCSV{
             return;
         }
 
-        for(int b = 1; b <= (linhas.size() - 1);b++){
-            a++;
-            String[] partes = linhas.get(b).split(";");
-            int id = Integer.parseInt(partes[0]);
-            LocalDate data = LocalDate.parse(partes[1]);
-            double valor = Double.parseDouble(partes[2]);
-            String descricao = partes[3];
-            String categoria = partes[4];
-            System.out.println("Transação " + b + ": " + "Id --> " + id + " | Data --> " + data + " | valor --> " + valor + " | descrição --> " + descricao + " | categoria --> " + categoria);
+        conta.MostrarTransacoes();
+        System.out.println("--> Digite o número da Transação que você quer remover (Digite de 1 a " + (linhas.size() - 1) + ")"); 
+        int indice = input.nextInt();
+        if( indice < 0 || indice > (linhas.size() - 1)){
+            System.out.println("[ERRO] Transação inexistente ");
+            return;
         }
-            System.out.println("--> Digite o número da Transação que você quer remover (Digite de 1 a " + a); 
-           
-            int indice = input.nextInt();
-            if( indice < 0 || indice > a){
-                throw new ArrayIndexOutOfBoundsException();
-            }
-            linhas.remove(indice);
-            System.out.println("Transação " + indice + " removida com sucesso!");
-            Files.write(Path.of("ArquivoArrayList.csv"), linhas, StandardCharsets.UTF_8);
-    } catch(NumberFormatException | ArrayIndexOutOfBoundsException | IOException e ){
-        System.out.println("Por favor,digite uma operação válida entre o intervalo dito acima");
+        linhas.remove(indice);
+        conta.removerTransacao(indice);
+        System.out.println("Transação " + indice + " removida com sucesso!");
+        Files.write(Path.of("ArquivoArrayList.csv"), linhas, StandardCharsets.UTF_8);
+    } catch(NumberFormatException | IOException e ){
+        System.out.println("Por favor,digite uma operação válida entre o intervalo citado");
     }}
 
     public static void AlterarTransacaoArquivo(Conta conta1,Conta conta2) {
         try{
-        Scanner input = new Scanner(System.in);
-        List<String> linhas = new ArrayList(Files.readAllLines(Path.of("ArquivoArrayList.csv"), StandardCharsets.UTF_8));
+            Scanner input = new Scanner(System.in);
+            int k = 0;
+            List<String> linhas = new ArrayList(Files.readAllLines(Path.of("ArquivoArrayList.csv"), StandardCharsets.UTF_8));
 
         if (linhas.size() - 1 < 1) {
-            System.out.println("Não há transações para remover");
+            System.out.println("Não há transações para alterar");
             return;
         }
 
-        for(int b = 1; b <= (linhas.size() - 1);b++){
-            String[] partes = linhas.get(b).split(";");
-            int id = Integer.parseInt(partes[0]);
-            LocalDate data = LocalDate.parse(partes[1]);
-            double valor = Double.parseDouble(partes[2]);
-            String descricao = partes[3];
-            String categoria = partes[4];
-            System.out.println("Transação " + b + ": " + "Id --> " + id + " | Data --> " + data + " | valor --> " + valor + " | descrição --> " + descricao + " | categoria --> " + categoria);
-        }
+        conta1.MostrarTransacoes();
 
-        System.out.println("--> Digite o número da Transação que você quer alterar: (Digite de 1 a " + linhas.size()); 
+        System.out.println("--> Digite o número da Transação que você quer alterar: (Digite de 1 a " + (linhas.size() - 1) + ")"); 
         int indice = input.nextInt();
 
-        if (indice < 1 || indice > linhas.size()) {
-            System.out.println("[ERRO] Transação inexistente.");
+        if (indice < 0 || indice > (linhas.size() - 1)) {
+            System.out.println("[ERRO] Transação inexistente ");
             return;
         }
 
         int id = (int) (Math.random() * 1000000000);
+
+        System.out.println("--> Agora digite o tipo de transição que voce deseja por: ");
+        System.out.println(" (1 --> Transferência | 2 --> Receita | 3 --> Despesa)");
+        while(true){
+            k = input.nextInt();
+            if (k < 1 || k > 3){
+                System.out.println("Essa opção não existe,tente novametne e digite o tipo pelo intervalo estabelecido");
+            } else{
+                break;
+            }
+        }
 
         System.out.println("--> Digite o valor da transação");
         double valor = input.nextDouble();
@@ -226,23 +264,23 @@ public class ContaCSV{
             throw new ValorInvalidoException("O valor da transação não pode ser 0 ou menor que isso");
         }
 
-        if (!conta1.saldo_Suficiente(valor)) {
-            throw new SaldoInsuficienteException("A conta não tem saldo suficiente para esta operação.");
+        if ((!conta1.saldo_Suficiente(valor)) && (k % 2 == 1)) {
+            throw new SaldoInsuficienteException("A conta não tem saldo suficiente para esta operação");
         }
 
         System.out.println("--> Digite o motivo para ocorrer essa transação");
         input.nextLine();
         String descricao = input.nextLine();
 
-        System.out.println("--> Digite a data: (Digite nos intervalos de Dia 1 a 28 | Mês 1 a 12 | Ano 2020 a 2026)");
-        int dia = input.nextInt();
+        System.out.println("--> Digite a data: (Digite nos intervalos de Mês: 1 a 12 | Ano: 2020 a 2026)");
+        int dia = (int) (Math.random() * 27 + 1);
         int mes = input.nextInt();
         int ano = input.nextInt();
-        if(dia < 1 || dia > 28 || mes < 1 || mes > 12 || ano < 2020 || ano > 2026){
-            throw new InputMismatchException("Uma das informações foi. fornecida fora do itnervalo estabeelcido");
+        if(mes < 1 || mes > 12 || ano < 2020 || ano > 2026){
+            throw new InputMismatchException("Uma das informações fornecida está fora do intervalo esclarecido acima");
         }
 
-        LocalDate data = LocalDate.of(dia,mes,ano); 
+        LocalDate data = LocalDate.of(ano,mes,dia); 
 
         System.out.println("--> Em qual tópico específico você deseja inserir? (número de 0 a 6)");
         System.out.println("(Alimentação --> 0) | (Transporte --> 1) | (Divída --> 2) | (Salário --> 3) ");
@@ -250,13 +288,6 @@ public class ContaCSV{
         int index = input.nextInt();
         String categoria = Categoria.getTopico(index);
 
-        if(conta1.getSaldoAtual() < 0){
-            throw new SaldoInsuficienteException("O valor imposto deixa o saldo negativo");
-        }
-
-        System.out.println("--> Agora digite o tipo de transição que voce deseja por");
-        System.out.println(" (1 --> Transferência | 2 --> Receita | 3 --> Despesa)");
-        int k = input.nextInt();
         Transacao t;
         switch(k){
             case 1:
@@ -269,17 +300,35 @@ public class ContaCSV{
                 t = new Despesa(id,data,valor,descricao,categoria);
                 break;
             default:
-                System.out.println("Por favor,insira um valor que está dentro do intervalo estabelecido acima");
-                break;
+                throw new InputMismatchException("Você digitou uma operação que não existe,a operação foi cancelada e nenhuma transação foi alterada");
         }
-
-        // eu vou parar por aqui tenho 2 prova pra estuda 
-        String conteudo = Files.readString(Path.of("ArquivoArrayList.csv"),StandardCharsets.UTF_8);
-        String LinhaAntiga = linhas.get(indice);
-        //Stirng LinhaNova = linhas
-        //String atualizado = conteudo.replace(LinhaAntiga,LinhaNova);
+        
+        linhas.set(indice,formatarLinhaCSV(t));
+        Files.write(Path.of("ArquivoArrayList.csv"), linhas, StandardCharsets.UTF_8);
+        conta1.alterarTransacao(indice,t);
+        sincronizarContas(conta1, conta2);
 
     } catch(ArrayIndexOutOfBoundsException | ValorInvalidoException | InputMismatchException | SaldoInsuficienteException | IOException e){
         System.err.println(e.getMessage());
+        System.err.println("a operação foi cancelada e nenhuma transação foi alterada");
     }}
+
+    private static String formatarLinhaCSV(Transacao t) {
+        return t.getId() + ";" + t.getData() + ";" + t.getValor() + ";" + t.getDescricao() + ";" + t.getCategoria();
+    }
+
+    public static void sincronizarContas(Conta conta1, Conta conta2) {
+        List<Transacao> atualizada = Recuperar(conta1, conta2);
+        conta1.substituirTransacoes(atualizada);
+        if (conta2 != null) {
+            conta2.substituirTransacoes(new ArrayList<>());
+            for (int i = 0; i < atualizada.size(); i++) {
+                Transacao t = atualizada.get(i);
+                if (t instanceof Transferencia) {
+                    conta2.adicionarTransacao(t);
+                }
+            }
+        }
+    }
 }
+

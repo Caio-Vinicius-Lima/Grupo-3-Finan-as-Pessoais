@@ -1,4 +1,15 @@
-public Relatorio(Conta conta,String Categoria,YearMonth mes,double saldoInicial){
+package ProgramaClasses;
+import java.time.YearMonth;
+import java.util.List;
+public class Relatorio {
+
+    private YearMonth mes;
+    private String Categoria;
+    private double saldoInicial;
+    private double saldo;
+    private Conta conta;
+
+    public Relatorio(Conta conta,String Categoria,YearMonth mes,double saldoInicial){
         this.mes = mes;
         this.Categoria = Categoria;
         this.saldoInicial = saldoInicial;
@@ -48,7 +59,7 @@ public Relatorio(Conta conta,String Categoria,YearMonth mes,double saldoInicial)
             System.out.println("Não há transações para ver");
             return;
         }
-        double c = conta.getSaldoAtual2(mes.minusMonths(1));
+        double c = conta.getSaldoAtual2(mes.minusMonths(1));   // saldo antes do mês
         for(int l = 0; l < F.size(); l++){
             Transacao d = F.get(l);
             if (YearMonth.from(d.getData()).equals(mes) && d.getCategoria().equals(categoria)) {
@@ -57,5 +68,5 @@ public Relatorio(Conta conta,String Categoria,YearMonth mes,double saldoInicial)
          }
       }
      System.out.println("o saldo nesse periodo foi de " + c + "\n");
-     }
+     }   
 }

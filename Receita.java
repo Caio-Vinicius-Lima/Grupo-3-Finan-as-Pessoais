@@ -1,8 +1,8 @@
+package ProgramaClasses;
 import java.time.LocalDate;
-
+import ProgramaExcecoes.*;
 public class Receita extends Transacao {
-
-    public Receita(int id, LocalDate data, double valor, String descricao, String categoria) {
+     public Receita(int id, LocalDate data, double valor, String descricao, String categoria) throws ValorInvalidoException {
         super(id, data, valor, descricao, categoria);
     }
 

@@ -1,3 +1,5 @@
+package ProgramaClasses;
+import ProgramaExcecoes.*;
 import java.time.LocalDate;
 public class Transferencia extends Transacao {
 
@@ -5,23 +7,18 @@ public class Transferencia extends Transacao {
     private Conta destino;
     private double valor_Transferido;
 
-    public Transferencia(int id, LocalDate data, double valor, String descricao, String categoria,Conta origem,Conta destino) {
+    public Transferencia(int id, LocalDate data, double valor, String descricao, String categoria,Conta origem,Conta destino) throws ValorInvalidoException,ContaNaoEncontradaException {
 
         super(id,data,valor,descricao,categoria);
+         if (origem == null || destino == null || origem == destino) {
+            throw new ContaNaoEncontradaException("As contas de origem e destino devem existir e ser diferentes.");
+        }
         this.destino = destino;
         this.origem = origem;
         this.valor_Transferido = valor;
     }
     
      public void realizar_Transferencia() throws ValorInvalidoException, ContaNaoEncontradaException, SaldoInsuficienteException {
-        
-        if (valor_Transferido <= 0) {
-            throw new ValorInvalidoException("O valor da transferência deve ser maior que zero.");
-        }
-        
-        if (origem == null || destino == null || origem == destino) {
-            throw new ContaNaoEncontradaException("As contas de origem e destino devem existir e ser diferentes.");
-        }
         
         if (!origem.saldo_Suficiente(valor_Transferido)) {
             throw new SaldoInsuficienteException("A conta não tem saldo suficiente para esta operação.");
@@ -47,6 +44,8 @@ public class Transferencia extends Transacao {
     return 0;
     }
 }
+
+
 
 
 
